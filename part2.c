@@ -16,9 +16,12 @@ main (int argc, char *argv[])
   if (argc == 1) arg_no = 1; /* default to attack1 */
   else arg_no = atoi (argv[1]);
   char filename[100]; /* filenames are all less than 10 characters */
-  sprintf (filename, "traces/attack%d", arg_no);
+  sprintf (filename, "./traces/attack%d", arg_no);
 
-  pcap_open_offline (filename, NULL);
+  char err[1000];
+  pcap_t *hey = pcap_open_offline (filename, err);
+
+  printf(err);
 
   return 0;
 }
