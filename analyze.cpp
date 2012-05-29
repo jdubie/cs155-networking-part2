@@ -6,6 +6,7 @@
 /* C++ Declarations */
 #include <string>
 #include <map>
+#include <vector>
 #include <iostream>
 
 #include "sr_protocol.h"
@@ -74,34 +75,25 @@ string
 src_to_s (sr_ip_hdr_t *ip, struct tcphdr *tcp)
 {
   //return ip_to_s (ip->ip_src) + ":" + port_to_s (tcp->source);
-  return ip_to_s (ip->ip_src);
+  //return ip_to_s (ip->ip_src);
+  return ip_to_s (ip->ip_src) + "\t" + ip_to_s (ip->ip_dst);
 }
 
 string
 dst_to_s (sr_ip_hdr_t *ip, struct tcphdr *tcp)
 {
   //return ip_to_s (ip->ip_dst) + ":" + port_to_s (tcp->dest);
-  return ip_to_s (ip->ip_dst);
+  return ip_to_s (ip->ip_dst) + "\t" + ip_to_s (ip->ip_src);
 }
 
 int
 main (int argc, char *argv[])
 {
-  /*if (argc > 2)
-    {
-      printf("incorrect number of args\n");
-      return 1;
-    }
-  int arg_no;
-  if (argc == 1) arg_no = 1; // default to attack1
-  else arg_no = atoi (argv[1]);
-  char filename[100]; // filenames are all less than 10 characters
-  sprintf (filename, "./traces/attack%d", arg_no);
-  */
-
   /* create hash table to keep track of connections */
-  map<string, int> requests;
-  map<string, int> responses;
+  map<string, int>    requests;
+  map<string, int>    responses;
+  vector<string>      scanners;
+  map<string, string> scanning;
 
   /* read in pcap file */
   char err[1000];
@@ -111,12 +103,6 @@ main (int argc, char *argv[])
 
   while (1)
     {
-      /*struct pcap_pkthdr **header;
-      const u_char **data;
-      int next = pcap_next_ex (dump, header, data);
-      if (next == 1) break;*/
-      
-
       struct pcap_pkthdr *header =
         (struct pcap_pkthdr *)malloc (sizeof (struct pcap_pkthdr));
       const u_char *p = pcap_next (dump, header);
@@ -136,18 +122,25 @@ main (int argc, char *argv[])
         responses[dst_to_s (ip, tcp)]++;
     }
 
-  cout << "\n**** START ****" << endl;
+  cout << "**** START *****" << endl;
+  cout << "<Source-IP>\t<Destination-IP>" << endl;
 
   map<string, int>::iterator iter;
   for (iter = requests.begin(); iter != requests.end(); iter++)
     {
-      if (is_scanning (iter->first,requests,responses))
-        cout << "SCANER!\t";
+      /*if (is_scanning (iter->first,requests,responses))
+        {
+          scanners.push_back (iter->first);
+          cout << "SCANER!\t";
+        }
 
-      cout << iter->first << "\t: (" << iter->second << "," << responses[iter->first] << ")" << endl;
+      cout << iter->first << "\t: (" << iter->second << "," << responses[iter->first] << ")" << endl;*/
+
+      if (is_scanning (iter->first,requests,responses))
+        cout << iter->first << endl;
     }
 
-  printf ("**** DONE ****\n");
+  printf ("**** FINISH ****\n");
 
 
   return 0;
