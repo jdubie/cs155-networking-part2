@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <map>
 
 #include <pcap.h>
 
 #include "sr_protocol.h"
+
+using namespace std; /* for vector */
 
 int main (int argc, char *argv[]);
 
@@ -13,6 +16,14 @@ print_ip (uint32_t addr)
   struct in_addr ia;
   ia.s_addr = addr;
   printf ("%s\n", inet_ntoa (ia));
+}
+
+char *
+ip_to_s (uint32_t addr)
+{
+  struct in_addr ia;
+  ia.s_addr = addr;
+  return inet_ntoa (ia);
 }
 
 int
@@ -32,9 +43,12 @@ main (int argc, char *argv[])
 
   /* create hash table to keep track of connections */
 
+  //vector<string>
+  
+
   /* read in pcap file */
   char err[1000];
-  char *filename = "./traces/part2Trace.pcap";
+  const char *filename = "./traces/part2Trace.pcap";
   pcap_t *dump   = pcap_open_offline (filename, err);
   printf("%s", err);
 
@@ -46,7 +60,8 @@ main (int argc, char *argv[])
       if (next == 1) break;*/
       
 
-      struct pcap_pkthdr *header = malloc (sizeof (struct pcap_pkthdr));
+      struct pcap_pkthdr *header =
+        (struct pcap_pkthdr *)malloc (sizeof (struct pcap_pkthdr));
       const u_char *p = pcap_next (dump, header);
       if (p == NULL) break;
 

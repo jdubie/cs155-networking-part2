@@ -1,7 +1,8 @@
-hellomake: part2.c
-	gcc -o part2 part2.c -lpcap 
+make: analyze.cpp
+	g++ -o lyze analyze.cpp -lpcap
+
 clean:
-	rm -f part2 
+	rm -f lyze 
 
 run:
 	gcc -o part2 part2.c -lpcap
