@@ -4,7 +4,6 @@
 #include <pcap.h>
 
 #include "sr_protocol.h"
-#include "hash.h"
 
 int main (int argc, char *argv[]);
 
@@ -14,35 +13,6 @@ print_ip (uint32_t addr)
   struct in_addr ia;
   ia.s_addr = addr;
   printf ("%s\n", inet_ntoa (ia));
-}
-
-struct pk_entry {
-  uint32_t ip;
-  uint32_t port;
-  struct hash_elem elem;
-};
-
-unsigned pk_hash_func (const struct hash_elem *e, void *aux)
-{
-  struct pk_entry *entry = hash_entry (e, struct pk_entry, elem);
-  // TODO: better hash function
-  return (unsigned) entry->port + entry->ip; /* not unique but hopfully goodneogh */
-}
-
-bool pk_less_func (const struct hash_elem *a,
-                     const struct hash_elem *b,
-                     void *aux) {
-  uint32_t a_ip = hash_entry (a, struct pk_entry, elem)->ip;
-  uint32_t b_ip = hash_entry (b, struct pk_entry, elem)->ip;
-  uint32_t a_port = hash_entry (a, struct pk_entry, elem)->port;
-  uint32_t b_port = hash_entry (b, struct pk_entry, elem)->port;
-  if (a_ip < b_ip)         return true;
-  else if (a_ip == b_ip)
-    {
-      if (a_port < b_port) return true;
-      else                 return false;
-    }
-  else                     return false;
 }
 
 int
@@ -61,8 +31,6 @@ main (int argc, char *argv[])
   */
 
   /* create hash table to keep track of connections */
-  struct hash *hash;
-  hash_init (hash, pk_hash_func, pk_less_func, NULL);  
 
   /* read in pcap file */
   char err[1000];
