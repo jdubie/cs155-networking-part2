@@ -85,6 +85,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+
+#define ASSERT(CONDITION) {}
 
 /* List element. */
 struct list_elem 

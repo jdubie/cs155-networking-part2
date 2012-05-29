@@ -1,5 +1,5 @@
 hellomake: part2.c
-	gcc -o part2 part2.c -lpcap
+	gcc -o part2 part2.c hash.c list.c -lpcap 
 clean:
 	rm -f part2 
 

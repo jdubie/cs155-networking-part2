@@ -6,8 +6,8 @@
    See hash.h for basic information. */
 
 #include "hash.h"
-#include "../debug.h"
-#include "threads/malloc.h"
+//#include "../debug.h"
+#include <stdlib.h>
 
 #define list_elem_to_hash_elem(LIST_ELEM)                       \
         list_entry(LIST_ELEM, struct hash_elem, list_elem)
