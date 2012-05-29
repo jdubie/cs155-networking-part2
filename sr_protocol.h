@@ -192,4 +192,36 @@ typedef struct sr_arp_hdr sr_arp_hdr_t;
 
 #define sr_IFACE_NAMELEN 32
 
+
+struct tcphdr {
+  unsigned short source;
+  unsigned short dest;
+  unsigned long seq;
+  unsigned long ack_seq;  
+#  if __BYTE_ORDER == __LITTLE_ENDIAN
+  unsigned short res1:4;
+  unsigned short doff:4;
+  unsigned short fin:1;
+  unsigned short syn:1;
+  unsigned short rst:1;
+  unsigned short psh:1;
+  unsigned short ack:1;
+  unsigned short urg:1;
+  unsigned short res2:2;
+#  elif __BYTE_ORDER == __BIG_ENDIAN
+  unsigned short doff:4;
+  unsigned short res1:4;
+  unsigned short res2:2;
+  unsigned short urg:1;
+  unsigned short ack:1;
+  unsigned short psh:1;
+  unsigned short rst:1;
+  unsigned short syn:1;
+  unsigned short fin:1;
+#  endif
+  unsigned short window;  
+  unsigned short check;
+  unsigned short urg_ptr;
+};
+
 #endif /* -- SR_PROTOCOL_H -- */
