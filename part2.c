@@ -3,8 +3,18 @@
 
 #include <pcap.h>
 
+#include "sr_protocol.h"
+
 int main (int argc, char *argv[]);
 //int open_ (int argc, char *argv[]);
+
+void
+print_ip (uint32_t addr)
+{
+  struct in_addr ia;
+  ia.s_addr = addr;
+  printf ("%s\n", inet_ntoa (ia));
+}
 
 int
 main (int argc, char *argv[])
@@ -33,10 +43,19 @@ main (int argc, char *argv[])
       const u_char **data;
       int next = pcap_next_ex (dump, header, data);
       if (next == 1) break;*/
+      
 
       struct pcap_pkthdr *header = malloc (sizeof (struct pcap_pkthdr));
-      const u_char *ret = pcap_next (dump, header);
-      if (ret == NULL) break;
+      const u_char *p = pcap_next (dump, header);
+      if (p == NULL) break;
+
+      /* cast to ip packet header */
+      sr_ethernet_hdr_t *eth_packet = (sr_ethernet_hdr_t *)p; 
+      char *_ip = ((char *)p) + sizeof (sr_ethernet_hdr_t);
+      sr_ip_hdr_t *ip = (sr_ip_hdr_t *)_ip;
+
+      print_ip (ip->ip_src);
+
     }
 
   printf ("**** DONE *****\n");
