@@ -1,12 +1,19 @@
+/* C Declarations */
 #include <stdio.h>
 #include <stdlib.h>
-#include <map>
-
 #include <pcap.h>
+
+/* C++ Declarations */
+#include <string>
+#include <map>
+#include <iostream>
 
 #include "sr_protocol.h"
 
 using namespace std; /* for vector */
+
+#define SCAN_RATIO   3 
+#define MIN_REQUESTS 5 
 
 int main (int argc, char *argv[]);
 
@@ -18,12 +25,63 @@ print_ip (uint32_t addr)
   printf ("%s\n", inet_ntoa (ia));
 }
 
-char *
+bool
+is_scanning (string key, map<string, int>requests,
+                        map<string, int>responses)
+{
+  /* someone who only scans a few ports isn't a scanner */
+  if (requests[key] < MIN_REQUESTS)
+    return false;
+
+  if (SCAN_RATIO * responses[key] / requests[key] < 1)
+    return true;
+
+  return false;
+}
+
+bool
+is_response (struct tcphdr *tcp)
+{
+  if (tcp->syn && tcp->ack) return true;
+  return false;
+}
+
+bool
+is_request (struct tcphdr *tcp)
+{
+  if (tcp->syn && !tcp->ack) return true;
+  return false;
+}
+
+string
+port_to_s (unsigned short port)
+{
+  char buffer[6];
+  sprintf (buffer, "%d", port);
+  return string (buffer);
+}
+
+string
 ip_to_s (uint32_t addr)
 {
   struct in_addr ia;
   ia.s_addr = addr;
-  return inet_ntoa (ia);
+  char *result = inet_ntoa (ia);
+  return string(result);
+}
+
+string
+src_to_s (sr_ip_hdr_t *ip, struct tcphdr *tcp)
+{
+  //return ip_to_s (ip->ip_src) + ":" + port_to_s (tcp->source);
+  return ip_to_s (ip->ip_src);
+}
+
+string
+dst_to_s (sr_ip_hdr_t *ip, struct tcphdr *tcp)
+{
+  //return ip_to_s (ip->ip_dst) + ":" + port_to_s (tcp->dest);
+  return ip_to_s (ip->ip_dst);
 }
 
 int
@@ -42,9 +100,8 @@ main (int argc, char *argv[])
   */
 
   /* create hash table to keep track of connections */
-
-  //vector<string>
-  
+  map<string, int> requests;
+  map<string, int> responses;
 
   /* read in pcap file */
   char err[1000];
@@ -69,16 +126,29 @@ main (int argc, char *argv[])
       sr_ethernet_hdr_t *eth_packet = (sr_ethernet_hdr_t *)p; 
       char *_ip = ((char *)p) + sizeof (sr_ethernet_hdr_t);
       sr_ip_hdr_t *ip = (sr_ip_hdr_t *)_ip;
+      char *_tcp = ((char *)ip) + sizeof (sr_ip_hdr_t);
+      struct tcphdr *tcp = (struct tcphdr *)_tcp;
 
-      print_ip (ip->ip_src);
-
+      if (is_request (tcp))
+        requests[src_to_s (ip, tcp)]++;
+        
+      if (is_response (tcp)) 
+        responses[dst_to_s (ip, tcp)]++;
     }
 
-  printf ("**** DONE *****\n");
+  cout << "\n**** START ****" << endl;
 
-  /* iterate through packets */
-  
-  
+  map<string, int>::iterator iter;
+  for (iter = requests.begin(); iter != requests.end(); iter++)
+    {
+      if (is_scanning (iter->first,requests,responses))
+        cout << "SCANER!\t";
+
+      cout << iter->first << "\t: (" << iter->second << "," << responses[iter->first] << ")" << endl;
+    }
+
+  printf ("**** DONE ****\n");
+
 
   return 0;
 }

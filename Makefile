@@ -5,7 +5,7 @@ clean:
 	rm -f lyze 
 
 run:
-	gcc -o part2 part2.c -lpcap
+	g++ -o lyze analyze.cpp -lpcap
 	./part2
 
 traces:
