@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <pcap.h>
 
+int main (int argc, char *argv[]);
+//int open_ (int argc, char *argv[]);
+
 int
 main (int argc, char *argv[])
 {
@@ -10,11 +13,12 @@ main (int argc, char *argv[])
       return 1;
     }
   int arg_no;
-  if (argc == 1) arg_no = 1; /* default to file 1 */
+  if (argc == 1) arg_no = 1; /* default to attack1 */
   else arg_no = atoi (argv[1]);
-  char file[100]; /* filenames are all less than 10 characters */
-  sprintf (file, "traces/attack%d", arg_no);
+  char filename[100]; /* filenames are all less than 10 characters */
+  sprintf (filename, "traces/attack%d", arg_no);
 
-  printf ("hello %s\n",file);
+  pcap_open_offline (filename, NULL);
+
   return 0;
 }
