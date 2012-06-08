@@ -24,14 +24,6 @@ using namespace std; /* for vector */
 
 int main (int argc, char *argv[]);
 
-/*void
-print_ip (uint32_t addr)
-{
-  struct in_addr ia;
-  ia.s_addr = addr;
-  printf ("%s\n", inet_ntoa (ia));
-}*/
-
 bool
 is_scanning (string key, map<string, int>requests,
                         map<string, int>responses)
@@ -61,54 +53,24 @@ is_request (struct tcphdr *tcp)
 }
 
 string
-port_to_s (unsigned short port)
-{
-  char buffer[6];
-  sprintf (buffer, "%d", port);
-  return string (buffer);
-}
-
-/*string
-ip_to_s (uint32_t addr)
-{
-  struct in_addr ia;
-  //ia.s_addr = ntohl (addr);
-  //ia.s_addr = ntohs (addr);
-  ia.s_addr = addr;
-  char *result = inet_ntoa (ia);
-  return string(result);
-}*/
-
-string
 ip_to_s (struct in_addr addr)
 {
   return string(inet_ntoa(addr));
-  /* from http://stackoverflow.com/questions/1680365/integer-to-ip-address-c */
-  /*unsigned char bytes[4];
-  bytes[0] = addr & 0xFF;
-  bytes[1] = (addr >> 8) & 0xFF;
-  bytes[2] = (addr >> 16) & 0xFF;
-  bytes[3] = (addr >> 24) & 0xFF;       
-  char result[17];
-  sprintf(result, "%d.%d.%d.%d\n", bytes[3], bytes[2], bytes[1], bytes[0]);*/
 }
 
-  string
+string
 src_to_s (struct ip *ip, struct tcphdr *tcp)
 {
-  //return ip_to_s (ip->ip_src) + ":" + port_to_s (tcp->source);
-  //return ip_to_s (ip->ip_src);
   return ip_to_s (ip->ip_src) + "\t" + ip_to_s (ip->ip_dst);
 }
 
-  string
+string
 dst_to_s (struct ip *ip, struct tcphdr *tcp)
 {
-  //return ip_to_s (ip->ip_dst) + ":" + port_to_s (tcp->dest);
   return ip_to_s (ip->ip_dst) + "\t" + ip_to_s (ip->ip_src);
 }
 
-  int
+int
 main (int argc, char *argv[])
 {
   /* create hash table to keep track of connections */
@@ -145,28 +107,12 @@ main (int argc, char *argv[])
       responses[dst_to_s (ip, tcp)]++;
   }
 
-  //cout << "**** START *****" << endl;
+  /* print results */
   cout << "<Source-IP>\t<Destination-IP>" << endl;
-
   map<string, int>::iterator iter;
   for (iter = requests.begin(); iter != requests.end(); iter++)
-  {
-    /*if (is_scanning (iter->first,requests,responses))
-      {
-      scanners.push_back (iter->first);
-      cout << "SCANER!\t";
-      }
-
-      cout << iter->first << "\t: (" << iter->second << "," << responses[iter->first] << ")" << endl;
-      */
-
-
     if (is_scanning (iter->first,requests,responses))
       cout << iter->first << endl;
-  }
-
-  //printf ("**** FINISH ****\n");
-
 
   return 0;
 }
