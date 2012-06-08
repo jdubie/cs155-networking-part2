@@ -2,20 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pcap.h>
-
-/* C++ Declarations */
-#include <string>
-#include <map>
-#include <vector>
-#include <iostream>
-
-//#include "sr_protocol.h"
 #include <netinet/ether.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+/* C++ Declarations */
+#include <string>
+#include <map>
+#include <vector>
+#include <iostream>
 
 using namespace std; /* for vector */
 
@@ -73,6 +71,11 @@ dst_to_s (struct ip *ip, struct tcphdr *tcp)
 int
 main (int argc, char *argv[])
 {
+  if (argc != 2)
+    {
+      printf("Usage scan: trace.pcap\n");
+      return 1;
+    }
   /* create hash table to keep track of connections */
   map<string, int>    requests;
   map<string, int>    responses;
@@ -81,7 +84,7 @@ main (int argc, char *argv[])
 
   /* read in pcap file */
   char err[1000];
-  const char *filename = "./traces/part2Trace.pcap";
+  const char *filename = argv[1];
   pcap_t *dump   = pcap_open_offline (filename, err);
   printf("%s", err);
 
