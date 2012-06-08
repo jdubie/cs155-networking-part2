@@ -1,8 +1,8 @@
-make: analyze.cpp
-	g++ -o lyze analyze.cpp -lpcap
+make: scan.cpp
+	g++ scan.cpp -L. -lpcap -o scan -Ilibpcap-1.1.1/
 
 clean:
-	rm -f lyze 
+	rm -f scan 
 
 run:
 	g++ -o lyze analyze.cpp -lpcap
